@@ -1,0 +1,16 @@
+[package]
+name = "gaffer_udp"
+version = "0.1.0"
+authors = ["Alex McArther <acmcarther@gmail.com>"]
+
+[dev-dependencies]
+cucumber = "*"
+
+[dependencies]
+byteorder = "*"
+itertools = "*"
+mio = "*"
+
+[[test]]
+name = "cucumber"
+path = "./features/cuke.rs"
