@@ -2,25 +2,25 @@ use cucumber::{
   Cucumber,
   CucumberRegistrar,
   InvokeResponse,
-  InvokeArgument
+  InvokeArgument,
 };
 
 use support::env::SocketWorld;
 
 use support::packets::FromTable;
 
-use std::net::{
-  ToSocketAddrs,
-  UdpSocket
-};
+use std::net::UdpSocket;
 
-use gaffer_udp::CompleteGafferPacket;
+use gaffer_udp::{
+  CompleteGafferPacket,
+  ToSingleSocketAddr,
+};
 
 pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
   Given!(c, "^a normal socket on (\\d+)$", |_, world: &mut SocketWorld, (port,): (u16,)| {
-    let addr_string = format!("127.0.0.1:{}", port);
+    let addr_string = ("127.0.0.1", port);
     world.sockets.remove(&port);
-    UdpSocket::bind(addr_string.as_str())
+    UdpSocket::bind(addr_string)
       .map(|socket| world.sockets.insert(port, socket))
       .map(|_| InvokeResponse::Success)
       .unwrap_or_else(|err| InvokeResponse::fail_from_str(&format!("Could not bind socket, {:?}", err)))
@@ -37,7 +37,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
       Ok(packet) => {
         world.sockets.get_mut(&own_port).ok_or(InvokeResponse::fail_from_str("No socket at that port"))
           .and_then(|socket| {
-            socket.send_to(packet.serialized().as_slice(), &format!("127.0.0.1:{}", remote_port).as_str())
+            socket.send_to(packet.serialized().as_slice(), ("127.0.0.1", remote_port))
               .map_err(|_| InvokeResponse::fail_from_str("Could not send packet"))
           })
           .map(|_| InvokeResponse::Success)
@@ -54,7 +54,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
          .map_err(|_| InvokeResponse::fail_from_str("Could not receive packet"))
       })
       .map(|(_, source)| {
-        let addr = format!("127.0.0.1:{}", remote_port).to_socket_addrs().unwrap().next().unwrap();
+        let addr = ("127.0.0.1", remote_port).to_single_socket_addr().unwrap();
         InvokeResponse::check_eq(source, addr)
       })
       .unwrap_or_else(|v| v)
@@ -71,7 +71,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
              .map_err(|_| InvokeResponse::fail_from_str("Could not receive packet"))
           })
           .and_then(|(_, source)| {
-            if source != format!("127.0.0.1:{}", remote_port).to_socket_addrs().unwrap().next().unwrap() {
+            if source != ("127.0.0.1", remote_port).to_single_socket_addr().unwrap() {
               Err(InvokeResponse::fail_from_str("Packet did not come from expected source"))
             } else {
               CompleteGafferPacket::deserialize(buffer.to_vec()).map_err(|_| {
