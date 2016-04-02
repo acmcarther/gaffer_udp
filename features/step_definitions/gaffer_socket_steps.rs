@@ -10,7 +10,7 @@ use support::packets::FromTable;
 
 use gaffer_udp::{
   GafferSocket,
-  SimpleGafferSocket,
+  SyncGafferSocket,
   GafferPacket,
   GafferPayload,
   ToSingleSocketAddr,
@@ -20,7 +20,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
   Given!(c, "^a gaffer socket on (\\d+)$", |_, world: &mut SocketWorld, (port,): (u16,)| {
     let addr_string = ("127.0.0.1", port);
     world.gaffer_sockets.remove(&port);
-    SimpleGafferSocket::bind(addr_string)
+    SyncGafferSocket::bind(addr_string)
       .map(|socket| world.gaffer_sockets.insert(port, socket))
       .map(|_| InvokeResponse::Success)
       .unwrap_or_else(|err| InvokeResponse::fail_from_str(&format!("Could not bind socket, {:?}", err)))

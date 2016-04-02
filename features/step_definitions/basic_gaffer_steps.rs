@@ -1,20 +1,15 @@
 use cucumber::{
-  Cucumber,
   CucumberRegistrar,
   InvokeResponse,
-  InvokeArgument
 };
 
 use support::env::SocketWorld;
-use support::packets::FromTable;
 
 use gaffer_udp::{
   GafferSocket,
-  SimpleGafferSocket,
+  SyncGafferSocket,
   GafferPacket,
   CompleteGafferPacket,
-  GafferPayload,
-  ToSingleSocketAddr,
 };
 
 use std::str;
@@ -25,7 +20,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
     world.packet_record = Vec::new();
     world.seq = 0;
     world.ack = 0;
-    world.gaffer_socket = Some(SimpleGafferSocket::bind(&("127.0.0.1", 9356)).unwrap());
+    world.gaffer_socket = Some(SyncGafferSocket::bind(&("127.0.0.1", 9356)).unwrap());
     InvokeResponse::Success
   });
 
@@ -83,7 +78,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
     })
   });
 
-  When!(c, "^the socket is sent (\\d+) packets?(?: to provide ack information)?$", |cuke: &Cucumber<SocketWorld>, world: &mut SocketWorld, (count,): (u32,)| {
+  When!(c, "^the socket is sent (\\d+) packets?(?: to provide ack information)?$", |_, world: &mut SocketWorld, (count,): (u32,)| {
     (0..count).fold(InvokeResponse::Success, |result, _| {
       if result != InvokeResponse::Success { return result; }
       let packet = CompleteGafferPacket {

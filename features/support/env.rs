@@ -1,12 +1,12 @@
 use std::net::UdpSocket;
 use std::collections::HashMap;
-use gaffer_udp::SimpleGafferSocket;
+use gaffer_udp::SyncGafferSocket;
 
 pub struct SocketWorld {
   pub sockets: HashMap<u16, UdpSocket>,
-  pub gaffer_sockets: HashMap<u16, SimpleGafferSocket>,
+  pub gaffer_sockets: HashMap<u16, SyncGafferSocket>,
   // TODO: Move these into a struct
-  pub gaffer_socket: Option<SimpleGafferSocket>,
+  pub gaffer_socket: Option<SyncGafferSocket>,
   pub socket: UdpSocket,
   pub seq: u16,
   pub ack: u16,
