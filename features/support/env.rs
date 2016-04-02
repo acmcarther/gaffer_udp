@@ -5,13 +5,25 @@ use gaffer_udp::SimpleGafferSocket;
 pub struct SocketWorld {
   pub sockets: HashMap<u16, UdpSocket>,
   pub gaffer_sockets: HashMap<u16, SimpleGafferSocket>,
+  // TODO: Move these into a struct
+  pub gaffer_socket: Option<SimpleGafferSocket>,
+  pub socket: UdpSocket,
+  pub seq: u16,
+  pub ack: u16,
+  pub packet_record: Vec<Vec<u8>>
 }
 
 impl SocketWorld {
   pub fn new() -> SocketWorld {
     SocketWorld {
       sockets: HashMap::new(),
-      gaffer_sockets: HashMap::new()
+      gaffer_sockets: HashMap::new(),
+      // TODO: Move these into a struct
+      gaffer_socket: None,
+      socket: UdpSocket::bind(&("127.0.0.1", 9355)).unwrap(),
+      seq: 0,
+      ack: 0,
+      packet_record: Vec::new()
     }
   }
 }

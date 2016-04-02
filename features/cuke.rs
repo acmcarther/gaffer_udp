@@ -14,6 +14,7 @@ use support::env::SocketWorld;
 fn main() {
   cucumber::start(SocketWorld::new(), &[
     &socket_steps::register_steps,
-    &gaffer_socket_steps::register_steps
+    &gaffer_socket_steps::register_steps,
+    &basic_gaffer_steps::register_steps
   ]);
 }
