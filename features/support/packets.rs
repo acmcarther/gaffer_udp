@@ -30,7 +30,7 @@ impl FromTable for CompleteGafferPacket {
       let key = row.get(0).unwrap();
       let value = row.get(1).unwrap();
 
-      match key.as_str() {
+      match key.as_ref() {
         "seq" => {
           seq = Some(try!(u16::from_str(value).map_err(|_| {InvokeResponse::fail_from_str("Could not convert seq to u16")})));
         },

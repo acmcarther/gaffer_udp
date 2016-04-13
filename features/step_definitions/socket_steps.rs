@@ -37,7 +37,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
       Ok(packet) => {
         world.sockets.get_mut(&own_port).ok_or(InvokeResponse::fail_from_str("No socket at that port"))
           .and_then(|socket| {
-            socket.send_to(packet.serialized().as_slice(), ("127.0.0.1", remote_port))
+            socket.send_to(packet.serialized().as_ref(), ("127.0.0.1", remote_port))
               .map_err(|_| InvokeResponse::fail_from_str("Could not send packet"))
           })
           .map(|_| InvokeResponse::Success)

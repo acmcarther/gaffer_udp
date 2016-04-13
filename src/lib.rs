@@ -249,7 +249,7 @@ impl SimpleGafferSocket {
     let destination = p.addr.clone(); // TODO: this is unnecessary
     let final_packet = SimpleGafferSocket::assemble_packet(seq_num, p.clone(), connection);
     let bytes = final_packet.serialized();
-    self.udp_socket.send_to(bytes.as_slice(), &destination).map(|result| {
+    self.udp_socket.send_to(bytes.as_ref(), &destination).map(|result| {
        connection.seq_num = seq_num.wrapping_add(1);
        result
     })
