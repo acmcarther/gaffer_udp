@@ -8,3 +8,6 @@ A rewrite of [game_udp](https://github.com/acmcarther/rust_game_udp), now that I
 
 Uses my [Rust Cucumber](https://github.com/acmcarther/cucumber) implementation for integration tests.
 
+## TODO
+
+Congestion avoidance. This is put off because space cubes does not need it yet
