@@ -8,20 +8,19 @@ use cucumber::{
 use support::env::SocketWorld;
 use support::packets::FromTable;
 
-use std::net::ToSocketAddrs;
-
 use gaffer_udp::{
   GafferSocket,
   SimpleGafferSocket,
   GafferPacket,
-  GafferPayload
+  GafferPayload,
+  ToSingleSocketAddr,
 };
 
 pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
   Given!(c, "^a gaffer socket on (\\d+)$", |_, world: &mut SocketWorld, (port,): (u16,)| {
-    let addr_string = format!("127.0.0.1:{}", port);
+    let addr_string = ("127.0.0.1", port);
     world.gaffer_sockets.remove(&port);
-    SimpleGafferSocket::bind(addr_string.as_str())
+    SimpleGafferSocket::bind(addr_string)
       .map(|socket| world.gaffer_sockets.insert(port, socket))
       .map(|_| InvokeResponse::Success)
       .unwrap_or_else(|err| InvokeResponse::fail_from_str(&format!("Could not bind socket, {:?}", err)))
@@ -37,7 +36,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
       Ok(payload) => {
         world.gaffer_sockets.get_mut(&own_port).ok_or(InvokeResponse::fail_from_str("No socket at that port"))
           .and_then(|socket| {
-            let addr = format!("127.0.0.1:{}", remote_port).to_socket_addrs().unwrap().next().unwrap();
+            let addr = ("127.0.0.1", remote_port).to_single_socket_addr().unwrap();
             let packet = GafferPacket { addr: addr, payload: payload };
             socket.send(packet)
               .map_err(|_| InvokeResponse::fail_from_str("Could not send packet"))
@@ -55,7 +54,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
           .map_err(|_| InvokeResponse::fail_from_str("Could not receive packet"))
       })
       .map(|recv_packet| {
-        let addr = format!("127.0.0.1:{}", remote_port).to_socket_addrs().unwrap().next().unwrap();
+        let addr = ("127.0.0.1", remote_port).to_single_socket_addr().unwrap();
         InvokeResponse::check_eq(recv_packet.addr, addr)
       })
       .unwrap_or_else(|v| v)
@@ -73,7 +72,7 @@ pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
           .map(|recv_packet| {
             payload.resize(1016, 0);
             let expected_packet = GafferPacket {
-              addr: format!("127.0.0.1:{}", remote_port).to_socket_addrs().unwrap().next().unwrap(),
+              addr: ("127.0.0.1", remote_port).to_single_socket_addr().unwrap(),
               payload: payload
             };
             InvokeResponse::check_eq(expected_packet, recv_packet)

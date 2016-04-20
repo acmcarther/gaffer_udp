@@ -18,6 +18,18 @@ use itertools::Itertools;
 
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 
+pub trait ToSingleSocketAddr {
+  fn to_single_socket_addr(&self) -> io::Result<SocketAddr>;
+}
+
+impl <T> ToSingleSocketAddr for T where T: ToSocketAddrs {
+  fn to_single_socket_addr(&self) -> io::Result<SocketAddr> {
+    self.to_socket_addrs().and_then(|mut iter| {
+      iter.next().ok_or(io::Error::new(io::ErrorKind::Other, "There was no socket addr"))
+    })
+  }
+}
+
 /// TODO: consider slice
 pub type GafferPayload = Vec<u8>;
 
@@ -27,7 +39,7 @@ pub type GafferPayload = Vec<u8>;
 ///
 /// NOTE: This protocol is very prone to starvations -- it expects high throughput!
 pub trait GafferSocket: Sized {
-  fn bind<A: ToSocketAddrs>(addr: A) -> io::Result<Self>;
+  fn bind<A: ToSingleSocketAddr>(addr: A) -> io::Result<Self>;
   fn recv(&mut self) -> io::Result<GafferPacket>;
   fn send(&mut self, packet: GafferPacket) -> io::Result<usize>;
 }
@@ -78,8 +90,8 @@ impl GafferPacket {
     GafferPacket::new("0.0.0.0:7878", GafferPayload::new())
   }
 
-  pub fn new<A: ToSocketAddrs>(addr: A, payload: GafferPayload) -> GafferPacket {
-    let first_addr = addr.to_socket_addrs().unwrap().next().unwrap();
+  pub fn new<A: ToSingleSocketAddr>(addr: A, payload: GafferPayload) -> GafferPacket {
+    let first_addr = addr.to_single_socket_addr().unwrap();
     GafferPacket { addr: first_addr, payload: payload }
   }
 }
@@ -250,8 +262,8 @@ impl SimpleGafferSocket {
 }
 
 impl GafferSocket for SimpleGafferSocket {
-  fn bind<A: ToSocketAddrs>(addr: A) -> io::Result<Self> {
-    let first_addr = addr.to_socket_addrs().unwrap().next().unwrap();
+  fn bind<A: ToSingleSocketAddr>(addr: A) -> io::Result<Self> {
+    let first_addr = addr.to_single_socket_addr().unwrap();
     UdpSocket::bind(&first_addr).map(|sock| {
       SimpleGafferSocket { udp_socket: sock, connections: HashMap::new() }
     })
