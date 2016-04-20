@@ -20,6 +20,8 @@ Feature: Reliability in variable network conditions
       This is a factor used by the simulated network to perturb the transmission time of packets using a normal distribution,
       where mean = 0.5*PD, and standard deviation of 1
 
+    - Drop Percentage:
+      This is the probability that any particular packet will be dropped
 
   Background:
     Given a network

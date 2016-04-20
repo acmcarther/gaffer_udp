@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-trait Challengee {
+pub trait Challengee {
   type Challenge;
   type Response;
 
@@ -8,7 +8,7 @@ trait Challengee {
 }
 
 
-trait Challenger {
+pub trait Challenger {
   type Challenge;
   type Response;
 
@@ -17,9 +17,9 @@ trait Challenger {
 }
 
 
-struct EchoChallengee {
-  domains: u32,
-  problem_state: HashMap<u32, u32>,
+pub struct EchoChallengee {
+  pub domains: u32,
+  pub problem_state: HashMap<u32, u32>,
 }
 
 impl EchoChallengee {
@@ -56,16 +56,16 @@ impl Challengee for EchoChallengee {
 }
 
 #[derive(Clone, Eq, PartialEq)]
-struct EchoChallenge {
+pub struct EchoChallenge {
   pub domain: u32,
   pub id: u32,
   pub value: u32
 }
 
-struct EchoChallenger {
-  domains: u32,
-  problem_state: HashMap<u32, u32>,
-  answer_state: HashMap<u32, HashSet<u32>>
+pub struct EchoChallenger {
+  pub domains: u32,
+  pub problem_state: HashMap<u32, u32>,
+  pub answer_state: HashMap<u32, HashSet<u32>>
 }
 
 impl EchoChallenger {
