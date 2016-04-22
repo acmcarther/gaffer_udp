@@ -9,12 +9,13 @@ use support::env::SocketWorld;
 use support::packets::FromTable;
 
 use gaffer_udp::{
-  GafferSocket,
-  SimpleGafferSocket,
-  GafferPacket,
-  GafferPayload,
   ToSingleSocketAddr,
+  GafferSocket,
+  GafferPacket,
+  GafferPayload
 };
+use gaffer_udp::blocking::SimpleGafferSocket;
+
 
 pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
   Given!(c, "^a gaffer socket on (\\d+)$", |_, world: &mut SocketWorld, (port,): (u16,)| {

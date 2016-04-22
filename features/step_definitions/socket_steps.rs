@@ -13,7 +13,7 @@ use std::net::UdpSocket;
 
 use gaffer_udp::{
   CompleteGafferPacket,
-  ToSingleSocketAddr,
+  ToSingleSocketAddr
 };
 
 pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
