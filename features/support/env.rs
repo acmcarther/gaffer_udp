@@ -1,10 +1,10 @@
 use std::net::UdpSocket;
 use std::collections::HashMap;
-use gaffer_udp::blocking::SimpleGafferSocket;
+use gaffer_udp::blocking::GafferSocket;
 
 pub struct SocketWorld {
   pub sockets: HashMap<u16, UdpSocket>,
-  pub gaffer_sockets: HashMap<u16, SimpleGafferSocket>,
+  pub gaffer_sockets: HashMap<u16, GafferSocket>,
 }
 
 impl SocketWorld {
