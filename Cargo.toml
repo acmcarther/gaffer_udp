@@ -10,3 +10,7 @@ cucumber = "*"
 byteorder = "*"
 itertools = "*"
 mio = "*"
+
+[[test]]
+name = "cucumber"
+path = "./features/cuke.rs"
