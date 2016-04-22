@@ -11,8 +11,10 @@ use support::packets::FromTable;
 
 use std::net::UdpSocket;
 
-use gaffer_udp::packet::CompleteGafferPacket;
-use gaffer_udp::addr::ToSingleSocketAddr;
+use gaffer_udp::{
+  CompleteGafferPacket,
+  ToSingleSocketAddr
+};
 
 pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
   Given!(c, "^a normal socket on (\\d+)$", |_, world: &mut SocketWorld, (port,): (u16,)| {

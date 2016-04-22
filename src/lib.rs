@@ -7,6 +7,11 @@ pub mod packet;
 pub mod connection;
 pub mod socket;
 
+pub use addr::ToSingleSocketAddr;
+pub use packet::*;
+pub use connection::*;
+pub use socket::*;
+
 #[cfg(test)]
 mod test {
   pub use addr::ToSingleSocketAddr;

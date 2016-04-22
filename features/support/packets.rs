@@ -1,4 +1,4 @@
-use gaffer_udp::packet::{
+use gaffer_udp::{
   CompleteGafferPacket,
   GafferPayload
 };

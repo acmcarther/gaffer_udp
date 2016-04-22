@@ -8,14 +8,13 @@ use cucumber::{
 use support::env::SocketWorld;
 use support::packets::FromTable;
 
-use gaffer_udp::addr::ToSingleSocketAddr;
-use gaffer_udp::socket::GafferSocket;
-use gaffer_udp::socket::blocking::SimpleGafferSocket;
-
-use gaffer_udp::packet::{
+use gaffer_udp::{
+  ToSingleSocketAddr,
+  GafferSocket,
   GafferPacket,
-  GafferPayload,
+  GafferPayload
 };
+use gaffer_udp::blocking::SimpleGafferSocket;
 
 
 pub fn register_steps(c: &mut CucumberRegistrar<SocketWorld>) {
