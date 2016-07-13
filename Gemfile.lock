@@ -2,7 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     builder (3.2.2)
-    cucumber (2.3.3)
+    cucumber (2.3.2)
       builder (>= 2.1.2)
       cucumber-core (~> 1.4.0)
       cucumber-wire (~> 0.0.1)
