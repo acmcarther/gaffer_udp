@@ -1,6 +1,6 @@
 [package]
 name = "gaffer_udp"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Alex McArther <acmcarther@gmail.com>"]
 description = "A protocol on top of udp providing some reliability. Not ready for public consumption."
 repository = "https://github.com/acmcarther/gaffer_udp"
