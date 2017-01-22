@@ -19,7 +19,7 @@ pub struct GafferSocket {
 impl GafferSocket {
   pub fn bind<A: ToSingleSocketAddr>(addr: A) -> io::Result<Self> {
     let first_addr = addr.to_single_socket_addr().unwrap();
-    UdpSocket::bound(&first_addr).map(|sock| {
+    UdpSocket::bind(&first_addr).map(|sock| {
       GafferSocket {
         udp_socket: sock,
         state: GafferState::new()
