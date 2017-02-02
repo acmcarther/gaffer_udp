@@ -24,7 +24,7 @@ impl GafferSocket {
       GafferSocket {
         udp_socket: sock,
         state: GafferState::new(),
-        recv_buffer: [8; 8192]
+        recv_buffer: [0; 8192]
       }
     })
   }
