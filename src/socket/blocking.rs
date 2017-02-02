@@ -13,7 +13,8 @@ use std::net::UdpSocket;
 
 pub struct GafferSocket {
   udp_socket: UdpSocket,
-  state: GafferState
+  state: GafferState,
+  recv_buffer: [u8; 8192]
 }
 
 impl GafferSocket {
@@ -22,7 +23,8 @@ impl GafferSocket {
     UdpSocket::bind(&first_addr).map(|sock| {
       GafferSocket {
         udp_socket: sock,
-        state: GafferState::new()
+        state: GafferState::new(),
+        recv_buffer: [8; 8192]
       }
     })
   }
@@ -35,10 +37,11 @@ impl GafferSocket {
   /// - Forget own acked packets
   /// - Enqueue Sure-Dropped packets into resubmit-queue
   pub fn recv(&mut self) -> io::Result<GafferPacket> {
-    let mut res = [0; 1024];
-    self.udp_socket.recv_from(&mut res)
+    let output = self.udp_socket.recv_from(&mut self.recv_buffer);
+
+    output
       // TODO: Fix to_vec, it is suboptimal here
-      .and_then(|(_, addr)| CompleteGafferPacket::deserialize(res.to_vec()).map(|res| (addr, res)) )
+      .and_then(|(len, addr)| CompleteGafferPacket::deserialize(self.recv_buffer[..len].to_vec()).map(|res| (addr, res)) )
       .map(|(addr, packet)| self.state.receive(addr, packet))
   }
 

@@ -13,7 +13,8 @@ use packet::{
 #[allow(dead_code)]
 pub struct GafferSocket {
   udp_socket: UdpSocket,
-  state: GafferState
+  state: GafferState,
+  recv_buffer: [u8; 8192]
 }
 
 impl GafferSocket {
@@ -22,7 +23,8 @@ impl GafferSocket {
     UdpSocket::bind(&first_addr).map(|sock| {
       GafferSocket {
         udp_socket: sock,
-        state: GafferState::new()
+        state: GafferState::new(),
+        recv_buffer: [8; 8192]
       }
     })
   }
@@ -35,13 +37,14 @@ impl GafferSocket {
   /// - Forget own acked packets
   /// - Enqueue Sure-Dropped packets into resubmit-queue
   pub fn recv(&mut self) -> io::Result<Option<GafferPacket>> {
-    let mut res = [0; 1024];
-    self.udp_socket.recv_from(&mut res)
+    let output = self.udp_socket.recv_from(&mut self.recv_buffer);
+
+    output
       // TODO: Fix to_vec, it is suboptimal here
       .and_then(|opt| {
         match opt {
-          Some((_, addr)) => {
-            CompleteGafferPacket::deserialize(res.to_vec())
+          Some((len, addr)) => {
+            CompleteGafferPacket::deserialize(self.recv_buffer[..len].to_vec())
               .map(|packet| Some(self.state.receive(addr, packet)))
           },
           None => Ok(None)
@@ -81,7 +84,7 @@ impl GafferSocket {
 mod tests{
 
   use super::*;
-  use packet::{GafferPayload, GafferPacket};
+  use packet::GafferPacket;
 
   #[test]
   fn recv_doesnt_block() {
@@ -96,7 +99,7 @@ mod tests{
   fn recv_can_recv() {
     let mut send_sock = GafferSocket::bind("0.0.0.0:45214").unwrap();
     let mut recv_sock = GafferSocket::bind("0.0.0.0:45215").unwrap();
-    let send_res = send_sock.send(GafferPacket::new("127.0.0.1:45215", GafferPayload::new()));
+    let send_res = send_sock.send(GafferPacket::new("127.0.0.1:45215", vec![1, 2, 3]));
     assert!(send_res.is_ok());
     assert!(send_res.unwrap().is_some());
 
@@ -105,7 +108,9 @@ mod tests{
     assert!(packet.is_ok());
     let packet_payload = packet.unwrap();
     assert!(packet_payload.is_some());
-    let addr = packet_payload.unwrap().addr;
+    let unwrap_pkt = packet_payload.unwrap();
+    assert_eq!(unwrap_pkt.payload, vec![1, 2, 3]);
+    let addr = unwrap_pkt.addr;
     assert_eq!(addr.to_string(), "127.0.0.1:45214");
   }
 }
