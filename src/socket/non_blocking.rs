@@ -37,13 +37,11 @@ impl GafferSocket {
   /// - Forget own acked packets
   /// - Enqueue Sure-Dropped packets into resubmit-queue
   pub fn recv(&mut self) -> io::Result<Option<GafferPacket>> {
-    let output = self.udp_socket.recv_from(&mut self.recv_buffer);
-
-    output
-      // TODO: Fix to_vec, it is suboptimal here
+    self.udp_socket.recv_from(&mut self.recv_buffer)
       .and_then(|opt| {
         match opt {
           Some((len, addr)) => {
+            // TODO: Fix to_vec, it is suboptimal here
             CompleteGafferPacket::deserialize(self.recv_buffer[..len].to_vec())
               .map(|packet| Some(self.state.receive(addr, packet)))
           },
