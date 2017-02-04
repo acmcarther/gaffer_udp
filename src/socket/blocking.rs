@@ -2,7 +2,8 @@ use addr::ToSingleSocketAddr;
 
 use packet::{
   CompleteGafferPacket,
-  GafferPacket
+  GafferPacket,
+  GAFFER_MTU,
 };
 
 use socket::GafferState;
@@ -14,7 +15,7 @@ use std::net::UdpSocket;
 pub struct GafferSocket {
   udp_socket: UdpSocket,
   state: GafferState,
-  recv_buffer: [u8; 8192]
+  recv_buffer: [u8; GAFFER_MTU],
 }
 
 impl GafferSocket {
@@ -24,7 +25,7 @@ impl GafferSocket {
       GafferSocket {
         udp_socket: sock,
         state: GafferState::new(),
-        recv_buffer: [0; 8192]
+        recv_buffer: [0; GAFFER_MTU]
       }
     })
   }
